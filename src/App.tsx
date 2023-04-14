@@ -1,26 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
 import './App.css';
+import CreateTemplateForm from './components/CreateTemplateForm';
+import { TemplateMetadataList } from 'aws-sdk/clients/ses';
+import Templates from './components/Templates';
+import SendEmailForm from './components/SendEmail';
+import { listTemplates } from './services';
 
 function App() {
+  const [templates, setTemplates] = useState<TemplateMetadataList>([]);
+
+  useEffect(() => {
+    async function fetchTemplates() {
+      const response = await listTemplates()
+      if (response.TemplatesMetadata) {
+        setTemplates(response.TemplatesMetadata)
+      }
+    }
+
+    fetchTemplates()
+  }, [])
+  
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='wrapper border-pink'>
+      <Templates templates={templates} setTemplates={setTemplates} />
+      <CreateTemplateForm setTemplates={setTemplates} />
+      <SendEmailForm />
     </div>
   );
 }
 
 export default App;
+
+
